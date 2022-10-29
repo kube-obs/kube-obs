@@ -1,0 +1,16 @@
+[package]
+name = "kube-obs-api"
+version = "0.1.0"  #:version
+authors = ["Mahesh Rayas]
+description = """
+Controller to get the cluster details
+"""
+documentation = "https://docs.rs/kube-obs-api"
+homepage = "https://github.com/<todo>"
+repository = "https://github.com/<todo>"
+readme = "README.md"
+keywords = ["kubernetes", "k8s"]
+license = "Unlicense OR MIT"
+edition = "2021"
+
+[dependencies]
