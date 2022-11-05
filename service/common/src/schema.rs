@@ -4,10 +4,10 @@ diesel::table! {
     watcher (resource_id) {
         resource_id -> Varchar,
         cluster -> Varchar,
-        resource_type -> Varchar,
-        namespace_name -> Varchar,
-        is_alerted -> Bpchar,
+        resource_type -> Nullable<Varchar>,
+        namespace_name -> Nullable<Varchar>,
         alerted_on -> Timestamp,
+        pod_details -> Nullable<Jsonb>,
     }
 }
 

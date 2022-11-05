@@ -1,5 +1,5 @@
 [package]
-name = "api"
+name = "kube-obs-api"
 version = "0.1.0"  #:version
 authors = ["Mahesh Rayas"]
 description = """
@@ -14,6 +14,4 @@ license = "Unlicense OR MIT"
 edition = "2021"
 
 [dependencies]
-
-diesel = { version = "2.0.2", features = ["postgres","chrono"] }
-dotenv = "0.15.0"
+common = { package = "common", path = "../common" }

@@ -19,3 +19,12 @@ path = "src/main.rs"
 
 [dependencies]
 common = { package = "common", path = "../common" }
+clap = { version ="4.0.18",features = ["derive"] }
+tokio = { version = "1.21.2", features = ["macros", "rt-multi-thread"] }
+thiserror = "1.0"
+kube = { version = "0.76.0", features = ["runtime", "derive"] }
+k8s-openapi = { version = "0.16.0", features = ["v1_25"] }
+futures = "0.3.21"
+diesel = { version = "2.0.2", features = ["postgres","chrono","serde_json"] }
+chrono = { version = "0.4.19", features = ["serde"] }
+serde_json = { version = "1.0.48", features = ["preserve_order"]}
