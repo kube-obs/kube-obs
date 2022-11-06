@@ -1,7 +1,7 @@
 use crate::schema::{watcher, watcher_history};
 use chrono::NaiveDateTime;
 
-#[derive(Default, Debug, Insertable, Queryable)]
+#[derive(Default, Debug, Insertable, Queryable, Identifiable, AsChangeset)]
 #[diesel(primary_key(resource_id))]
 #[table_name = "watcher"]
 pub struct Watcher {
@@ -9,8 +9,9 @@ pub struct Watcher {
     pub cluster: String,
     pub resource_type: String,
     pub namespace_name: Option<String>,
+    pub pod_status: Option<String>,
     pub alerted_on: NaiveDateTime,
-    pub pod_details: serde_json::Value,
+    pub pod_event: serde_json::Value,
 }
 
 #[derive(Default, Debug, Insertable, Queryable)]

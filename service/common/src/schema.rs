@@ -6,8 +6,9 @@ diesel::table! {
         cluster -> Varchar,
         resource_type -> Nullable<Varchar>,
         namespace_name -> Nullable<Varchar>,
+        pod_status -> Nullable<Varchar>,
         alerted_on -> Timestamp,
-        pod_details -> Nullable<Jsonb>,
+        pod_event -> Nullable<Jsonb>,
     }
 }
 

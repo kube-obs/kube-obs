@@ -5,9 +5,11 @@ CREATE TABLE watcher (
   cluster VARCHAR NOT NULL,
   resource_type VARCHAR,
   namespace_name  VARCHAR,
+  pod_status VARCHAR,
   alerted_on TIMESTAMP NOT NULL,
-  pod_details Jsonb
+  pod_event Jsonb
 );
+
 
 CREATE TABLE watcher_history (
   resource_id VARCHAR,

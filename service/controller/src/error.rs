@@ -10,6 +10,13 @@ pub enum Error {
     /// Error in user input or typically missing fields.
     #[error("Invalid User Input: {0}")]
     UserInputError(String),
+
+    /// Any error originating from the `kube-rs` crate
+    #[error("SQL Error: {source}")]
+    SQLError {
+        #[from]
+        source: diesel::result::Error,
+    },
 }
 
 impl From<String> for Error {
