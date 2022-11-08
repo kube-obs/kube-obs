@@ -1,15 +1,19 @@
-use crate::error::*;
-use chrono::{NaiveDateTime, Utc};
-use common::init_logging;
-use common::{model::Watcher, model::WatcherHistory, watcher, watcher_history};
-use diesel::dsl::exists;
 use diesel::pg::PgConnection;
-use diesel::{prelude::*, select};
-use serde_json::Value;
+use diesel::prelude::*;
+use tracing::debug;
 
 pub fn delete_pod_resource(conn: &mut PgConnection, res: String) -> usize {
     use common::schema::watcher::dsl::*;
-    diesel::delete(watcher.filter(resource_id.eq(res)))
+    debug!(
+        "cleaning up pod {} from watcher as the pod no longer exists in cluster",
+        res
+    );
+    let u = diesel::delete(watcher.filter(resource_id.eq(res.clone())))
         .execute(conn)
-        .expect("Failed to delete resource {res}")
+        .expect("Failed to delete resource");
+    debug!(
+        "Success: cleaning up pod {} from watcher as the pod no longer exists in cluster",
+        res
+    );
+    u
 }

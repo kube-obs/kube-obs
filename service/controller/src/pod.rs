@@ -11,10 +11,11 @@ use crate::create::create_watcher;
 use crate::delete::delete_pod_resource;
 use crate::error::Error;
 use crate::list::list_watcher;
+use tracing::{debug, error, info};
 
 const IGNORE_POD_PHASE: [&str; 2] = ["Running", "Succeeded"];
 // 60 sec clean up db
-const interval_millis: Duration = time::Duration::from_millis(60 * 1000);
+const INTERVAL_MILLIS: Duration = time::Duration::from_millis(60 * 1000);
 
 //https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-phase
 // status &&String as pod_status.phase.as_ref() returns Option<&String> and .filter returns &&String
@@ -64,7 +65,6 @@ pub(crate) async fn pod_watcher() {
 
 async fn check_for_pod_failures(events: &Api<Event>, p: Pod) -> Result<(), Error> {
     let name = p.metadata.name.clone().unwrap();
-
     if let Some(pod_status) = &p.status {
         // check if the PodStatus is not in IGNORE_POD_PHASE
         if let Some(s) = pod_status.phase.as_ref().filter(check_status) {
@@ -99,6 +99,6 @@ pub async fn db_clean() -> Result<(), Error> {
                 delete_pod_resource(&mut connection, r.0);
             };
         }
-        tokio::time::sleep(interval_millis).await;
+        tokio::time::sleep(INTERVAL_MILLIS).await;
     }
 }

@@ -1,11 +1,6 @@
 use crate::error::*;
-use chrono::{NaiveDateTime, Utc};
-use common::init_logging;
-use common::{model::Watcher, model::WatcherHistory, watcher, watcher_history};
-use diesel::dsl::exists;
 use diesel::pg::PgConnection;
-use diesel::{prelude::*, select};
-use serde_json::Value;
+use diesel::prelude::*;
 
 pub fn list_watcher(conn: &mut PgConnection) -> Result<Vec<(String, Option<String>)>, Error> {
     use common::schema::watcher::dsl::*;
