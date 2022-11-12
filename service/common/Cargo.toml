@@ -14,3 +14,4 @@ diesel = { version = "2.0.2", features = ["postgres","chrono","serde_json"] }
 dotenv = "0.15.0"
 serde_json = { version = "1.0.48", features = ["preserve_order"]}
 chrono = { version = "0.4.19", features = ["serde"] }
+serde = { version = "1.0", features = ["derive"] }

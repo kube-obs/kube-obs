@@ -7,10 +7,9 @@ use k8s_openapi::api::core::v1::{Event, Pod};
 use kube::runtime::{watcher, WatchStreamExt};
 use kube::{api::ListParams, Api, Client};
 
-use crate::create::create_watcher;
-use crate::delete::delete_pod_resource;
+//use crate::create::create_watcher;
+//use crate::delete::delete_pod_resource;
 use crate::error::Error;
-use crate::list::list_watcher;
 use tracing::{debug, error, info};
 
 const IGNORE_POD_PHASE: [&str; 2] = ["Running", "Succeeded"];
@@ -35,12 +34,14 @@ impl DbOperations for Pod {
             resource_type: "Pod".to_string(), // TODO, can be enum?
             namespace_name: self.metadata.namespace.clone(),
             alerted_on: Utc::now().naive_utc(),
-            pod_event: serde_json::to_value(&e).unwrap(),
+            pod_event: Some(serde_json::to_value(&e).unwrap()),
             pod_status: self.status.clone().unwrap().phase,
         };
-        let mut connection = establish_connection();
+
+        //let mut connection = establish_connection();
         // Insert into DB
-        create_watcher(&mut connection, &w)
+        //create_watcher(&mut connection, &w)
+        Ok(())
     }
 }
 
@@ -86,19 +87,19 @@ async fn check_for_pod_failures(events: &Api<Event>, p: Pod) -> Result<(), Error
     Ok(())
 }
 
-pub async fn db_clean() -> Result<(), Error> {
-    loop {
-        // get all pod resources id from db and check if the resource id exists in cluster
-        let mut connection = establish_connection();
-        let resources = list_watcher(&mut connection)?;
-        let client = Client::try_default().await?;
-        for r in resources {
-            let pods: Api<Pod> = Api::namespaced(client.clone(), &r.1.unwrap());
-            if pods.get_opt(&r.0).await?.is_none() {
-                // pod doesn't exist in cluster , hence delete it from table,
-                delete_pod_resource(&mut connection, r.0);
-            };
-        }
-        tokio::time::sleep(INTERVAL_MILLIS).await;
-    }
-}
+// pub async fn db_clean() -> Result<(), Error> {
+//     loop {
+//         // get all pod resources id from db and check if the resource id exists in cluster
+//         let mut connection = establish_connection();
+//         let resources = list_watcher(&mut connection)?;
+//         let client = Client::try_default().await?;
+//         for r in resources {
+//             let pods: Api<Pod> = Api::namespaced(client.clone(), &r.1.unwrap());
+//             if pods.get_opt(&r.0).await?.is_none() {
+//                 // pod doesn't exist in cluster , hence delete it from table,
+//                 delete_pod_resource(&mut connection, r.0);
+//             };
+//         }
+//         tokio::time::sleep(INTERVAL_MILLIS).await;
+//     }
+// }

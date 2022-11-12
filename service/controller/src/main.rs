@@ -1,16 +1,9 @@
 mod args;
-mod create;
-mod delete;
 mod error;
-mod list;
 use std::process;
 mod pod;
 
-use crate::{
-    args::Args,
-    error::Error,
-    pod::{db_clean, pod_watcher},
-};
+use crate::{args::Args, error::Error, pod::pod_watcher};
 
 use args::ArgsImpl;
 use common::init_logging;
@@ -25,7 +18,7 @@ async fn main() -> Result<(), Error> {
 
             tokio::select! {
                 _ = pod_watcher() => println!("pod event watcher failed"),
-               _  = db_clean() => println!("db clean exited"),
+               //_  = db_clean() => println!("db clean exited"),
             }
 
             // delete the pods events from DB which are not in cluster

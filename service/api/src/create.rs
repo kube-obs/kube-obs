@@ -1,14 +1,39 @@
 use crate::error::*;
+use actix_web::{post, web, App, Error, HttpRequest, HttpResponse, Responder};
 use chrono::Utc;
 use common::{model::Watcher, model::WatcherHistory, watcher_history};
 use diesel::dsl::exists;
 use diesel::pg::PgConnection;
+use diesel::r2d2::{self, ConnectionManager};
 use diesel::{prelude::*, select};
 use tracing::{debug, error, info};
 
-pub fn create_watcher(conn: &mut PgConnection, w: &Watcher) -> Result<(), Error> {
+type DbPool = r2d2::Pool<ConnectionManager<PgConnection>>;
+type DbError = Box<dyn std::error::Error + Send + Sync>;
+/// Inserts new user with name defined in form.
+#[post("/pods")]
+pub async fn add_pods(
+    pool: web::Data<DbPool>,
+    form: web::Json<Watcher>,
+) -> Result<HttpResponse, Error> {
+    // use web::block to offload blocking Diesel code without blocking server thread
+    let pods = web::block(move || {
+        let mut conn = pool.get()?;
+        create_watcher(&mut conn, form)
+    })
+    .await?
+    .map_err(actix_web::error::ErrorInternalServerError)?;
+
+    Ok(HttpResponse::Ok().json(pods))
+}
+
+pub fn create_watcher(conn: &mut PgConnection, w: web::Json<Watcher>) -> Result<Watcher, DbError> {
     use common::schema::watcher::dsl::*;
-    debug!("storing the pod details {} into watcher table", w.pod_event);
+
+    debug!(
+        "storing the pod details {:?} into watcher table",
+        w.pod_event
+    );
     debug!(
         "check if the pod details for {:?} already exists in watcher table",
         w.resource_id
@@ -20,7 +45,7 @@ pub fn create_watcher(conn: &mut PgConnection, w: &Watcher) -> Result<(), Error>
     if !resource_exists {
         info!("Insert pod {:?}, in watcher table", w.resource_id);
         let _ = diesel::insert_into(watcher)
-            .values(w)
+            .values(&*w)
             .execute(conn)
             .expect("Error saving data into watcher");
         info!("Success: pod {:?} inserted in watcher table", w.resource_id);
@@ -42,5 +67,5 @@ pub fn create_watcher(conn: &mut PgConnection, w: &Watcher) -> Result<(), Error>
         .execute(conn)
         .expect("Error saving data into watcher_history");
 
-    Ok(())
+    Ok(w.0)
 }

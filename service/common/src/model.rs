@@ -1,7 +1,14 @@
 use crate::schema::{watcher, watcher_history};
 use chrono::NaiveDateTime;
+use serde::{Deserialize, Serialize};
+use std::fmt::Display;
+use std::str::FromStr;
 
-#[derive(Default, Debug, Insertable, Queryable, Identifiable, AsChangeset)]
+use serde::{de, Deserializer};
+
+#[derive(
+    Default, Debug, Insertable, Queryable, Identifiable, AsChangeset, Serialize, Deserialize,
+)]
 #[diesel(primary_key(resource_id))]
 #[table_name = "watcher"]
 pub struct Watcher {
@@ -10,8 +17,9 @@ pub struct Watcher {
     pub resource_type: String,
     pub namespace_name: Option<String>,
     pub pod_status: Option<String>,
+    // example: 2007-04-05T14:30:30
     pub alerted_on: NaiveDateTime,
-    pub pod_event: serde_json::Value,
+    pub pod_event: Option<serde_json::Value>,
 }
 
 #[derive(Default, Debug, Insertable, Queryable)]
