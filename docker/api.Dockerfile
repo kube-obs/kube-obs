@@ -19,7 +19,7 @@ COPY service/api/src /app/service/api/src
 COPY service/common/src /app/service/common/src
 RUN --mount=type=cache,target=/usr/local/cargo/registry  touch /app/service/common/src/lib.rs /app/service/api/src/main.rs && cargo build --release
 
-FROM debian:buster-slim AS app
+FROM debian:bullseye-slim AS app
 RUN apt-get update && apt-get install libpq5 -y
 COPY --from=build /app/service/api/target/release/api /api
 EXPOSE 9090

@@ -8,7 +8,7 @@ RUN cargo install diesel_cli \
     --no-default-features \
     --features "postgres"
 
-FROM debian:buster-slim AS app
+FROM debian:bullseye-slim AS app
 
 COPY --from=builder  /usr/local/cargo/bin/diesel /usr/local/bin/
 

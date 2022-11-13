@@ -10,7 +10,7 @@ tracing-subscriber = { version = "0.3.12", features = ["json", "env-filter"] }
 tracing-opentelemetry = "0.18.0"
 opentelemetry = { version = "0.18.0" , features= ["rt-tokio"]}
 opentelemetry-otlp = { version = "0.11.0"}
-diesel = { version = "2.0.2", features = ["postgres","chrono","serde_json"] }
+diesel = { version = "2.0.2", features = ["postgres","chrono","serde_json","r2d2"] }
 dotenv = "0.15.0"
 serde_json = { version = "1.0.48", features = ["preserve_order"]}
 chrono = { version = "0.4.19", features = ["serde"] }

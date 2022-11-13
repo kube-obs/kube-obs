@@ -1,3 +1,4 @@
+use async_trait::async_trait;
 use backoff::ExponentialBackoff;
 use chrono::Utc;
 use common::{establish_connection, Watcher};
@@ -6,6 +7,7 @@ use futures::{pin_mut, TryStreamExt};
 use k8s_openapi::api::core::v1::{Event, Pod};
 use kube::runtime::{watcher, WatchStreamExt};
 use kube::{api::ListParams, Api, Client};
+use std::env;
 
 //use crate::create::create_watcher;
 //use crate::delete::delete_pod_resource;
@@ -21,13 +23,18 @@ const INTERVAL_MILLIS: Duration = time::Duration::from_millis(60 * 1000);
 fn check_status(status: &&String) -> bool {
     !IGNORE_POD_PHASE.contains(&status.as_str())
 }
-
+#[async_trait]
 trait DbOperations {
-    fn insert(&self, e: Event, cluster: String) -> Result<(), Error>;
+    async fn insert(&self, e: Event, cluster: String) -> Result<(), Error>;
+
+    fn get_api_url() -> String {
+        env::var("API_SERVER_URL").expect("API_SERVER_URL must be set")
+    }
 }
 
+#[async_trait]
 impl DbOperations for Pod {
-    fn insert(&self, e: Event, cluster: String) -> Result<(), Error> {
+    async fn insert(&self, e: Event, cluster: String) -> Result<(), Error> {
         let w = Watcher {
             resource_id: self.metadata.name.clone(),
             cluster,
@@ -37,10 +44,13 @@ impl DbOperations for Pod {
             pod_event: Some(serde_json::to_value(&e).unwrap()),
             pod_status: self.status.clone().unwrap().phase,
         };
-
-        //let mut connection = establish_connection();
-        // Insert into DB
-        //create_watcher(&mut connection, &w)
+        let client = reqwest::Client::new();
+        let res = client
+            .post(format!("http://{}/pods", Self::get_api_url())) // TODO: Get this url from the Arg or environment variabel
+            .json(&w)
+            .send()
+            .await?;
+        // TODO: validate response
         Ok(())
     }
 }
@@ -76,7 +86,7 @@ async fn check_for_pod_failures(events: &Api<Event>, p: Pod) -> Result<(), Error
             let evlist = events.list(&opts).await?;
             for e in evlist {
                 println!("pod name in action {}", name);
-                if let Err(e) = p.insert(e, "cluster".to_string()) {
+                if let Err(e) = p.insert(e, "cluster".to_string()).await {
                     //
                     println!("insert error");
                 }

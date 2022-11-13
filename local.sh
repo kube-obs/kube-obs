@@ -1,5 +1,6 @@
 #!/bin/sh
 set -o errexit
+# delete if cluster already exists
 kind delete cluster
 # create registry container unless it already exists
 reg_name='kind-registry'
@@ -42,10 +43,18 @@ EOF
 helm repo add bitnami https://charts.bitnami.com/bitnami
 helm install postgresql-dev bitnami/postgresql --values local/postgres/values.yaml
 
-docker build . -t localhost:5001/kube-obs-api:0.1 -f docker/Dockerfile
+export DOCKER_BUILDKIT=1
+
+# takes ~10min for build for the first time
+docker build . -t localhost:5001/kube-obs-api:0.1 -f docker/api.Dockerfile
 docker push localhost:5001/kube-obs-api:0.1
-docker build . -t localhost:5001/kube-obs-init:0.1 -f docker/initContainer.dockerfile
+docker build . -t localhost:5001/kube-obs-init:0.1 -f docker/initContainer.Dockerfile
 docker push localhost:5001/kube-obs-init:0.1
+# takes ~10min for build for the first time
+docker build . -t localhost:5001/kube-obs-controller:0.2 -f docker/controller.Dockerfile
+docker push localhost:5001/kube-obs-controller:0.2
 
 sleep 30 # for db to come up
-kubectl apply -f local/api.yaml
+kubectl apply -f local/api.yaml -n default
+sleep 20 # for api to come up
+kubectl apply -f local/controller.yaml

@@ -12,10 +12,10 @@ pub enum Error {
     UserInputError(String),
 
     /// Any error originating from the `kube-rs` crate
-    #[error("SQL Error: {source}")]
-    SQLError {
+    #[error("Reqwest Error: {source}")]
+    ReqwestError {
         #[from]
-        source: diesel::result::Error,
+        source: reqwest::Error,
     },
 }
 
