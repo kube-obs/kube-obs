@@ -4,12 +4,9 @@ mod error;
 // mod delete;
 // mod list;
 
-use actix_web::{web, App, HttpRequest, HttpServer, Responder};
+use actix_web::{web, App, HttpServer};
 use create::add_pods;
-use diesel::{
-    prelude::*,
-    r2d2::{self, ConnectionManager},
-};
+use diesel::r2d2::{self};
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -23,7 +20,7 @@ async fn main() -> std::io::Result<()> {
             .app_data(web::Data::new(pool.clone()))
             .service(add_pods)
     })
-    .bind(("127.0.0.1", 9090))?
+    .bind(("0.0.0.0", 9090))?
     .run()
     .await
 }
