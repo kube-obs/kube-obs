@@ -1,4 +1,4 @@
-use actix_web::{error::BlockingError, ResponseError};
+use actix_web::{error::BlockingError};
 
 /// All errors possible to occur during reconciliation
 #[derive(Debug, thiserror::Error)]
@@ -25,7 +25,6 @@ pub enum Error {
         #[from]
         source: BlockingError,
     },
-
 }
 
 impl From<String> for Error {

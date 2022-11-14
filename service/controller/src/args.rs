@@ -1,8 +1,10 @@
-use crate::error::Error;
+use std::str::FromStr;
+
+use crate::{error::Error, util::Timer};
 use clap::Parser;
 
 pub(crate) struct ArgsImpl {
-    pub(crate) debug: bool,
+    pub(crate) timelapse: Timer,
 }
 
 #[derive(Parser, Debug)]
@@ -11,6 +13,13 @@ pub(crate) struct Args {
     /// supply --debug to print the debug information
     #[arg(short, long, action = clap::ArgAction::Count)]
     debug: u8,
+    // Resource lapse duration, usually how long the resouce can be in non running state before it can be notified
+    // 2s implies 2 seconds
+    // 2m implies 2 minutes
+    // 2h implies 2 hours
+    // 2d implese 2 days
+    #[clap(short, long, default_value_t = String::from("2m"))]
+    pub timelapse: String,
 }
 
 impl Args {
@@ -27,6 +36,7 @@ impl Args {
                 debug = false;
             }
         }
-        Ok(ArgsImpl { debug })
+        let timelapse: Timer = Timer::from_str(&cli.timelapse)?;
+        Ok(ArgsImpl { timelapse })
     }
 }
