@@ -77,11 +77,12 @@ pub(crate) async fn pod_watcher(d: &Timer) {
 }
 
 async fn check_for_pod_failures(events: &Api<Event>, p: Pod, d: &Timer) -> Result<(), Error> {
-    let name = p.metadata.name.clone().unwrap();
+    let pod_name = p.metadata.name.clone().unwrap();
+    // println!("pod {} status {:?}", pod_name, &p.status);
     if let Some(pod_status) = &p.status {
         // check if the pod start time is greater than threshold start time
         let Some(resource_start_time) = &pod_status.start_time else {
-            debug!("resources {} start time is None or its a delete event ", name);
+            debug!("resources {} start time is None or its a delete event ", pod_name);
             return Ok(())
         };
         if time_diff(resource_start_time.0, d) {
@@ -89,16 +90,15 @@ async fn check_for_pod_failures(events: &Api<Event>, p: Pod, d: &Timer) -> Resul
             if let Some(s) = pod_status.phase.as_ref().filter(check_status) {
                 let opts = ListParams::default().fields(&format!(
                     "involvedObject.kind=Pod,involvedObject.name={}",
-                    name
+                    pod_name
                 ));
-                let evlist = events.list(&opts).await?;
-                for e in evlist {
-                    println!("pod name in action {}", name);
+                let ev_list = events.list(&opts).await?;
+                for e in ev_list {
+                    debug!("Watching event for pod {}", pod_name);
                     if let Err(e) = p.insert(e, "cluster".to_string()).await {
-                        //
-                        println!("insert error");
+                        error!("Error when adding pod details to Databse {}", e);
                     }
-                    println!("sucessfully inserted");
+                    info!("Pod {} details updated in database", pod_name);
                 }
             }
         }
@@ -107,6 +107,7 @@ async fn check_for_pod_failures(events: &Api<Event>, p: Pod, d: &Timer) -> Resul
 }
 
 // pub async fn db_clean() -> Result<(), Error> {
+//     // delete
 //     loop {
 //         // get all pod resources id from db and check if the resource id exists in cluster
 //         let mut connection = establish_connection();

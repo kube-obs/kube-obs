@@ -11,7 +11,7 @@ type DbPool = r2d2::Pool<ConnectionManager<PgConnection>>;
 type DbError = Box<dyn std::error::Error + Send + Sync>;
 /// Inserts new user with name defined in form.
 #[post("/pods")]
-pub async fn add_pods(
+pub async fn add_pod(
     pool: web::Data<DbPool>,
     form: web::Json<Watcher>,
 ) -> Result<HttpResponse, Error> {

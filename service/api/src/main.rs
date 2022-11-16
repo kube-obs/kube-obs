@@ -5,7 +5,7 @@ mod error;
 // mod list;
 
 use actix_web::{web, App, HttpServer};
-use create::add_pods;
+use create::add_pod;
 use diesel::r2d2::{self};
 
 #[actix_web::main]
@@ -18,7 +18,8 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .app_data(web::Data::new(pool.clone()))
-            .service(add_pods)
+            .service(add_pod)
+        // .service(delete_pod)
     })
     .bind(("0.0.0.0", 9090))?
     .run()
