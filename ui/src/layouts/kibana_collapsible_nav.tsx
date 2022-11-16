@@ -150,7 +150,7 @@ const CollapsibleNav = () => {
               size="s"
               listItems={[
                 {
-                  label: 'Manage deployment',
+                  label: 'Deployments',
                   href: '#',
                   iconType: 'logoCloud',
                   iconProps: {
@@ -188,7 +188,7 @@ const CollapsibleNav = () => {
               className="eui-textInheritColor"
               href="#/navigation/collapsible-nav"
               onClick={e => e.stopPropagation()}>
-              Analytics
+              Dashboards
             </a>
           }
           buttonElement="div"
@@ -223,10 +223,9 @@ const CollapsibleNav = () => {
             items: [
               <EuiHeaderLogo
                 key="elastic-logo"
-                iconType="logoElastic"
-                href={`${pathPrefix}/kibana`}>
-                Elastic
-              </EuiHeaderLogo>,
+                iconType="logoElasticStack"
+                href={`${pathPrefix}/kibana`}></EuiHeaderLogo>,
+              <span className="logo">KubeOBS</span>,
             ],
             borders: 'none',
           },
