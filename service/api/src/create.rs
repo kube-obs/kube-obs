@@ -1,18 +1,17 @@
-use crate::error::*;
-use actix_web::{post, web, App, Error, HttpRequest, HttpResponse, Responder};
+use actix_web::{post, web, Error, HttpResponse};
 use chrono::Utc;
 use common::{model::Watcher, model::WatcherHistory, watcher_history};
 use diesel::dsl::exists;
 use diesel::pg::PgConnection;
 use diesel::r2d2::{self, ConnectionManager};
 use diesel::{prelude::*, select};
-use tracing::{debug, error, info};
+use tracing::{debug, info};
 
 type DbPool = r2d2::Pool<ConnectionManager<PgConnection>>;
 type DbError = Box<dyn std::error::Error + Send + Sync>;
 /// Inserts new user with name defined in form.
 #[post("/pods")]
-pub async fn add_pods(
+pub async fn add_pod(
     pool: web::Data<DbPool>,
     form: web::Json<Watcher>,
 ) -> Result<HttpResponse, Error> {
@@ -53,7 +52,11 @@ pub fn create_watcher(conn: &mut PgConnection, w: web::Json<Watcher>) -> Result<
         info!("Updating pod {:?}, in watcher table", w.resource_id);
         diesel::update(watcher)
             .filter(resource_id.eq(w.resource_id.clone().unwrap()))
-            .set((alerted_on.eq(w.alerted_on), pod_event.eq(&w.pod_event)))
+            .set((
+                pod_status.eq(&w.pod_status),
+                alerted_on.eq(w.alerted_on),
+                pod_event.eq(&w.pod_event),
+            ))
             .execute(conn)
             .expect("Error updating data into watcher");
         info!("Success: pod {:?} updated in watcher table", w.resource_id);

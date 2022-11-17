@@ -1,16 +1,12 @@
 use crate::schema::{watcher, watcher_history};
 use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
-use std::fmt::Display;
-use std::str::FromStr;
-
-use serde::{de, Deserializer};
 
 #[derive(
     Default, Debug, Insertable, Queryable, Identifiable, AsChangeset, Serialize, Deserialize,
 )]
 #[diesel(primary_key(resource_id))]
-#[table_name = "watcher"]
+#[diesel(table_name = watcher)]
 pub struct Watcher {
     pub resource_id: Option<String>,
     pub cluster: String,
@@ -24,16 +20,8 @@ pub struct Watcher {
 
 #[derive(Default, Debug, Insertable, Queryable)]
 #[diesel(primary_key(resource_id, alerted_on))]
-#[table_name = "watcher_history"]
+#[diesel(table_name = watcher_history)]
 pub struct WatcherHistory {
     pub resource_id: Option<String>,
     pub alerted_on: NaiveDateTime,
-}
-
-#[derive(Default, Debug, Queryable)]
-#[diesel(primary_key(resource_id))]
-pub struct WatcherList<'a> {
-    pub resource_id: &'a str,
-    pub alerted_on: String,
-    pub namespace_name: String,
 }

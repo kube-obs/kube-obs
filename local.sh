@@ -6,9 +6,9 @@ kind delete cluster
 reg_name='kind-registry'
 reg_port='5001'
 if [ "$(docker inspect -f '{{.State.Running}}' "${reg_name}" 2>/dev/null || true)" != 'true' ]; then
-    docker run \
-        -d --restart=always -p "127.0.0.1:${reg_port}:5000" --name "${reg_name}" \
-        registry:2
+  docker run \
+    -d --restart=always -p "127.0.0.1:${reg_port}:5000" --name "${reg_name}" \
+    registry:2
 fi
 
 # create a cluster with the local registry enabled in containerd
@@ -23,7 +23,7 @@ EOF
 
 # connect the registry to the cluster network if not already connected
 if [ "$(docker inspect -f='{{json .NetworkSettings.Networks.kind}}' "${reg_name}")" = 'null' ]; then
-    docker network connect "kind" "${reg_name}"
+  docker network connect "kind" "${reg_name}"
 fi
 
 # Document the local registry
@@ -51,8 +51,8 @@ docker push localhost:5001/kube-obs-api:0.1
 docker build . -t localhost:5001/kube-obs-init:0.1 -f docker/initContainer.Dockerfile
 docker push localhost:5001/kube-obs-init:0.1
 # takes ~10min for build for the first time
-docker build . -t localhost:5001/kube-obs-controller:0.2 -f docker/controller.Dockerfile
-docker push localhost:5001/kube-obs-controller:0.2
+docker build . -t localhost:5001/kube-obs-controller:0.1 -f docker/controller.Dockerfile
+docker push localhost:5001/kube-obs-controller:0.1
 
 sleep 30 # for db to come up
 kubectl apply -f local/api.yaml -n default
