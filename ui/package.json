@@ -32,10 +32,14 @@
     "url": "https://github.com/elastic/next-eui-starter/issues"
   },
   "dependencies": {
+    "@apollo/server": "^4.1.1",
+    "@as-integrations/next": "^1.1.0",
     "@elastic/eui": "^68.0.0",
     "@emotion/cache": "^11.10.3",
     "@emotion/react": "^11.10.4",
     "core-js": "^3.25.1",
+    "graphql": "^16.6.0",
+    "graphql-tag": "^2.12.6",
     "regenerator-runtime": "^0.13.9"
   },
   "devDependencies": {
