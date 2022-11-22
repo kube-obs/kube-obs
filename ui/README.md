@@ -27,8 +27,7 @@
     UI is available on http://localhost:5601
     Elasticsearch is available on localhost:9200
 
-1.  Navigate to GraphQL playground and run the mutation `setupElasticsearch` to set it up
-    http://localhost:3000/api/graphql?query=mutation+%7B%0A++setupElasticsearch%28input%3A%7B%7D%29%0A%7D
+1.  Run UI with `yarn dev` and then, optionally, run `yarn ingestMockData` to ingest mock data from JSON folder
 ---
 
 ## 🧐 What's inside?
