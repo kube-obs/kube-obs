@@ -1,35 +1,20 @@
-import { ApolloServer } from '@apollo/server';
-import { startServerAndCreateNextHandler } from '@as-integrations/next';
-import {
-  ApolloServerPluginLandingPageLocalDefault,
-  ApolloServerPluginLandingPageProductionDefault,
-} from '@apollo/server/plugin/landingPage/default';
-import { gql } from 'graphql-tag';
+// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
+import { createYoga } from 'graphql-yoga';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import { schema } from '../../graphql';
 
-const resolvers = {
-  Query: {
-    hello: () => 'world',
+export const config = {
+  api: {
+    // Disable body parsing (required for file uploads)
+    bodyParser: false,
   },
 };
 
-const typeDefs = gql`
-  type Query {
-    hello: String
-  }
-`;
-
-const server = new ApolloServer({
-  resolvers,
-  typeDefs,
-  introspection: true,
-  plugins: [
-    process.env.NODE_ENV === 'production'
-      ? ApolloServerPluginLandingPageProductionDefault({
-          graphRef: 'my-graph-id@my-graph-variant',
-          footer: false,
-        })
-      : ApolloServerPluginLandingPageLocalDefault({ footer: false }),
-  ],
+export default createYoga<{
+  req: NextApiRequest;
+  res: NextApiResponse;
+}>({
+  schema,
+  // Needed to be defined explicitly because our endpoint lives at a different path other than `/graphql`
+  graphqlEndpoint: '/api/graphql',
 });
-
-export default startServerAndCreateNextHandler(server);
