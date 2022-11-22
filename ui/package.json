@@ -23,7 +23,9 @@
     "lint": "tsc && next lint",
     "start": "next start",
     "test-docs": "yarn lint && bash scripts/test-docs.sh",
-    "schema": "ts-node --transpile-only src/pages/api/schema.ts"
+    "schema": "ts-node --transpile-only src/pages/api/schema.ts",
+    "ingestMockData": "ts-node src/elastic/mock.ts",
+    "codegen": "graphql-codegen --config codegen.ts"
   },
   "repository": {
     "type": "git",
@@ -33,21 +35,29 @@
     "url": "https://github.com/elastic/next-eui-starter/issues"
   },
   "dependencies": {
+    "@apollo/client": "^3.7.1",
+    "@elastic/elasticsearch": "7.11.0",
     "@elastic/eui": "^68.0.0",
     "@emotion/cache": "^11.10.3",
     "@emotion/react": "^11.10.4",
     "@graphql-tools/schema": "^9.0.10",
+    "@types/glob": "^8.0.0",
     "core-js": "^3.25.1",
     "graphql": "^16.6.0",
     "graphql-scalars": "^1.20.1",
     "graphql-tag": "^2.12.6",
     "graphql-yoga": "^3.0.1",
     "nexus": "^1.3.0",
-    "regenerator-runtime": "^0.13.9"
+    "regenerator-runtime": "^0.13.9",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@elastic/datemath": "^5.0.3",
     "@emotion/babel-plugin": "^11.10.2",
+    "@graphql-codegen/cli": "2.13.12",
+    "@graphql-codegen/client-preset": "^1.1.4",
+    "@graphql-codegen/typescript-react-apollo": "^3.3.6",
+    "@graphql-codegen/typescript-urql": "^3.7.3",
     "@next/bundle-analyzer": "^12.3.1",
     "@types/node": "^16.11.10",
     "@typescript-eslint/eslint-plugin": "^5.5.0",
@@ -56,7 +66,7 @@
     "eslint-config-next": "12.0.4",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
-    "glob": "^7.2.0",
+    "glob": "^8.0.3",
     "iniparser": "^1.0.5",
     "moment": "^2.29.4",
     "next": "^12.3.1",

@@ -23,7 +23,12 @@
 
     Open the `my-eui-starter` directory in your code editor of choice and edit `src/pages/index.tsx`. Save your changes and the browser will update in real time!
 
+1.  Navigate to `elk` folder and run docker-compose up which will start the Elasticsearch Cluster
+    UI is available on http://localhost:5601
+    Elasticsearch is available on localhost:9200
 
+1.  Navigate to GraphQL playground and run the mutation `setupElasticsearch` to set it up
+    http://localhost:3000/api/graphql?query=mutation+%7B%0A++setupElasticsearch%28input%3A%7B%7D%29%0A%7D
 ---
 
 ## 🧐 What's inside?

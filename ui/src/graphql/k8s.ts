@@ -1,3 +1,9 @@
+import { client } from '../elastic/client';
+import glob from 'glob';
+import { v4 as uuidv4 } from 'uuid';
+
+const FILE_DIR = __dirname;
+
 export const typeDefs = `
   enum EventType {
     POD,
@@ -31,16 +37,21 @@ export const resolvers = {
   Query: {},
   Mutation: {
     addResource(parent: unknown, args: { input: object }) {
-      console.log('>>> debug ', args.input);
+      console.log('>>> received resource ', args.input);
       return {
         resource: 100,
       };
     },
-    addEvent(parent: unknown, args: { input: object }) {
-      console.log('>>> debug ', args.input);
-      return {
-        event: 100,
-      };
+    async addEvent(parent: unknown, args: { input: any }) {
+      console.log('>>> received event ', args.input);
+      const res = await client.create({
+        id: uuidv4(),
+        index: 'kube-obs',
+        type: args.input.type,
+        body: args.input,
+      });
+
+      return res.body;
     },
   },
 };

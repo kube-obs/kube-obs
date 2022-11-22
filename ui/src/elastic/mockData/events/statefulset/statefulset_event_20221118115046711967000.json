@@ -1,0 +1,47 @@
+{
+  "apiVersion": "v1",
+  "kind": "Event",
+  "count": 1,
+  "firstTimestamp": "2022-11-18T00:50:46Z",
+  "involvedObject": {
+    "apiVersion": "apps/v1",
+    "kind": "StatefulSet",
+    "name": "test-kuber1-ss1",
+    "namespace": "kuber1",
+    "resourceVersion": "158683",
+    "uid": "afc8b216-94a0-4ef2-8398-a3586be6595a"
+  },
+  "lastTimestamp": "2022-11-18T00:50:46Z",
+  "message": "create Pod test-kuber1-ss1-0 in StatefulSet test-kuber1-ss1 successful",
+  "metadata": {
+    "creationTimestamp": "2022-11-18T00:50:46Z",
+    "managedFields": [
+      {
+        "apiVersion": "v1",
+        "fieldsType": "FieldsV1",
+        "fieldsV1": {
+          "f:count": {},
+          "f:firstTimestamp": {},
+          "f:involvedObject": {},
+          "f:lastTimestamp": {},
+          "f:message": {},
+          "f:reason": {},
+          "f:source": { "f:component": {} },
+          "f:type": {}
+        },
+        "manager": "kube-controller-manager",
+        "operation": "Update",
+        "time": "2022-11-18T00:50:46Z"
+      }
+    ],
+    "name": "test-kuber1-ss1.1728878037b3b9c8",
+    "namespace": "kuber1",
+    "resourceVersion": "158688",
+    "uid": "922fc906-ae7f-4df7-ad14-09f022570df6"
+  },
+  "reason": "SuccessfulCreate",
+  "reportingComponent": "",
+  "reportingInstance": "",
+  "source": { "component": "statefulset-controller" },
+  "type": "Normal"
+}
