@@ -1,7 +1,7 @@
 use crate::error::Error;
 use async_trait::async_trait;
 use backoff::ExponentialBackoff;
-use chrono::{DateTime, NaiveDateTime, Utc};
+use chrono::{ NaiveDateTime, Utc};
 use futures::{pin_mut, TryStreamExt};
 use k8s_openapi::api::core::v1::{Event, Pod};
 use kube::runtime::{watcher, WatchStreamExt};
@@ -9,7 +9,7 @@ use kube::{api::ListParams, Api, Client};
 use reqwest::header;
 use reqwest::StatusCode;
 use serde::{Deserialize, Serialize};
-use serde_json::{json, Value};
+use serde_json::{json, };
 use std::env;
 use tracing::{debug, error, info};
 #[allow(dead_code)]
