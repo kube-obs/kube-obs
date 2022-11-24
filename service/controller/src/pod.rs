@@ -17,7 +17,7 @@ const IGNORE_POD_PHASE: [&str; 2] = ["Running", "Succeeded"];
 
 #[derive(Debug, Deserialize, Serialize)]
 struct ElasticEvent {
-    document: serde_json::Value,
+    document: Event,
     #[serde(rename = "@timestamp")]
     timestamp: NaiveDateTime,
     #[serde(rename = "@cluster")]
@@ -34,7 +34,7 @@ struct ElasticEvent {
 
 #[async_trait]
 trait ExportData {
-    async fn send_data(&self, e: &Event, cluster: &str) -> Result<(), Error>;
+    async fn send_data(&self, e: Event, cluster: &str) -> Result<(), Error>;
     fn get_api_url() -> String {
         //local: http://localhost:3000/api/event
         env::var("API_SERVER_URL").expect("API_SERVER_URL must be set, for example \n export API_SERVER_URL=http://localhost:3000/api/event")
@@ -44,7 +44,7 @@ trait ExportData {
 #[async_trait]
 #[allow(unused_variables)]
 impl ExportData for Pod {
-    async fn send_data(&self, e: &Event, cluster: &str) -> Result<(), Error> {
+    async fn send_data(&self, e: Event, cluster: &str) -> Result<(), Error> {
         let url = format!("{}/POD", Self::get_api_url());
         let mut headers = header::HeaderMap::new();
         headers.insert("content-type", "application/json".parse().unwrap());
@@ -52,8 +52,9 @@ impl ExportData for Pod {
             .redirect(reqwest::redirect::Policy::none())
             .build()
             .unwrap();
+
         let z = json!(ElasticEvent {
-            document: json!(&e),
+            document: e,
             timestamp: Utc::now().naive_utc(),
             cluster: cluster.to_string(),
         });
@@ -73,7 +74,7 @@ impl ExportData for Pod {
             info!(
                 "post event successful for pod {}",
                 &self.metadata.name.as_ref().unwrap()
-            )
+            );
         }
         Ok(())
     }
@@ -105,10 +106,10 @@ async fn check_for_pod_failures(events: &Api<Event>, p: Pod, c: &String) -> Resu
     ));
     let ev_list = events.list(&opts).await?;
     for e in ev_list {
-        debug!("Watching event for pod {}", pod_name);
+        debug!("Sending event {:?} for pod {}", e, pod_name);
         //TODO: Cluster need to be passed as an args or get it from Kubernetes metadata
-        p.send_data(&e, &c).await?;
-        debug!("Success: Pod {} post event {:?} success", pod_name, e);
+        p.send_data(e, &c).await?;
+        debug!("Successful event pod {}", pod_name);
     }
     // }
     Ok(())
