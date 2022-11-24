@@ -34,3 +34,17 @@ curl -S -X POST -H "Content-Type: application/json" -d @input.json http://localh
 
 ```
 
+## Run locally in Local terminal
+
+## kube-obs service Controller
+
+1. Spin up KIND cluster 
+
+2. Excecute below scripts in terminal
+  
+```bash
+export API_SERVER_URL="http://localhost:3000/api/event"
+cargo run --bin controller --
+```
+
+3. Deploy some sample pods in KIND cluster 
