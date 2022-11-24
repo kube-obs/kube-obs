@@ -14,13 +14,12 @@ import {
   useGeneratedHtmlId,
   EuiAvatar,
   EuiThemeProvider,
+  EuiBetaBadge,
 } from '@elastic/eui';
 import find from 'lodash/find';
 import findIndex from 'lodash/findIndex';
 import { css } from '@emotion/react';
 import ThemeSwitcher from '../components/chrome/theme_switcher';
-
-const pathPrefix = process.env.PATH_PREFIX;
 
 const TopLinks: EuiPinnableListGroupItemProps[] = [
   {
@@ -28,15 +27,18 @@ const TopLinks: EuiPinnableListGroupItemProps[] = [
     iconType: 'home',
     isActive: true,
     'aria-current': true,
-    href: `${pathPrefix}/kibana`,
+    href: `/kibana`,
     pinnable: false,
   },
 ];
 
 const KibanaLinks: EuiPinnableListGroupItemProps[] = [
-  { label: 'Discover', href: `${pathPrefix}/kibana/discover` },
-  { label: 'Dashboard', href: `${pathPrefix}/kibana/dashboards` },
-  { label: 'Maps', href: `${pathPrefix}/kibana/maps` },
+  { label: 'Cluster Health', href: `/dashboards/cluster-health` },
+  { label: 'Pods', href: `/dashboards/pods` },
+];
+
+const SecurityLinks: EuiPinnableListGroupItemProps[] = [
+  { label: 'Pods', href: `/dashboards/pods` },
 ];
 
 const CollapsibleNav = () => {
@@ -181,7 +183,7 @@ const CollapsibleNav = () => {
       </EuiFlexItem>
       <EuiHorizontalRule margin="none" />
       {/* Menu items */}
-      <EuiFlexItem className="eui-yScroll">
+      <EuiFlexItem className="">
         <EuiCollapsibleNavGroup
           title={
             <a
@@ -208,6 +210,33 @@ const CollapsibleNav = () => {
           />
         </EuiCollapsibleNavGroup>
       </EuiFlexItem>
+      <EuiFlexItem className="">
+        <EuiCollapsibleNavGroup
+          title={
+            <a
+              className="eui-textInheritColor"
+              href="#/navigation/collapsible-nav"
+              onClick={e => e.stopPropagation()}>
+              Security
+            </a>
+          }
+          buttonElement="div"
+          iconType="logoSecurity"
+          isCollapsible={true}
+          initialIsOpen={true}
+          onToggle={(isOpen: boolean) => toggleAccordion(isOpen, 'Kibana')}>
+          <EuiPinnableListGroup
+            aria-label="Kibana" // A11y : EuiCollapsibleNavGroup can't correctly pass the `title` as the `aria-label` to the right HTML element, so it must be added manually
+            listItems={alterLinksWithCurrentState(SecurityLinks)}
+            pinTitle={addLinkNameToPinTitle}
+            onPinClick={addPin}
+            maxWidth="none"
+            color="subdued"
+            gutterSize="none"
+            size="s"
+          />
+        </EuiCollapsibleNavGroup>
+      </EuiFlexItem>
     </EuiCollapsibleNav>
   );
 
@@ -224,8 +253,10 @@ const CollapsibleNav = () => {
               <EuiHeaderLogo
                 key="elastic-logo"
                 iconType="logoElasticStack"
-                href={`${pathPrefix}/kibana`}></EuiHeaderLogo>,
-              <span className="logo">KubeOBS</span>,
+                href={`/`}></EuiHeaderLogo>,
+              <a href="/" className="logo">
+                KubeOBS
+              </a>,
             ],
             borders: 'none',
           },
@@ -235,7 +266,7 @@ const CollapsibleNav = () => {
               <EuiHeaderSectionItemButton
                 key={useGeneratedHtmlId()}
                 aria-label="Account menu">
-                <EuiAvatar name="John Username" size="s" />
+                <EuiAvatar name="User" size="s" />
               </EuiHeaderSectionItemButton>,
             ],
             borders: 'none',
@@ -255,7 +286,15 @@ const CollapsibleNav = () => {
               <EuiHeaderSectionItemButton
                 key={useGeneratedHtmlId()}
                 aria-label="Account menu">
-                <EuiAvatar type="space" name="Default Space" size="s" />
+                <EuiBetaBadge
+                  style={{
+                    verticalAlign: 'bottom',
+                    cursor: 'pointer',
+                  }}
+                  label="Cluster 1"
+                  color={'accent'}
+                  tooltipContent="This module is not GA. Please help us by reporting any bugs."
+                />
               </EuiHeaderSectionItemButton>,
             ],
             breadcrumbs: breadcrumbs,

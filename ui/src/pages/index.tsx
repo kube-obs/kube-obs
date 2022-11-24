@@ -1,26 +1,11 @@
+import { EuiCard, EuiFlexGroup, EuiFlexItem, EuiIcon } from '@elastic/eui';
 import { FunctionComponent } from 'react';
-import Head from 'next/head';
-import {
-  EuiCard,
-  EuiFlexGroup,
-  EuiFlexItem,
-  EuiIcon,
-  EuiSpacer,
-} from '@elastic/eui';
-import HomeHero from '../components/starter/home_hero';
-import Wrapper from '../components/starter/wrapper';
-import HomeTemplates from '../components/starter/home_templates';
-import HomeWhy from '../components/starter/home_why';
 import KibanaLayout from '../layouts/kibana';
 
 const Index: FunctionComponent = () => {
   return (
     <>
-      <KibanaLayout
-        template="empty"
-        pageHeader={{
-          pageTitle: 'Welcome',
-        }}>
+      <KibanaLayout pageHeader={{}}>
         <EuiFlexGroup gutterSize="l">
           <EuiFlexItem>
             <EuiCard
