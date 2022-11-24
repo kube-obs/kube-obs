@@ -1,11 +1,7 @@
-use std::str::FromStr;
-
-use crate::{error::Error, util::Timer};
+use crate::error::Error;
 use clap::Parser;
 
-pub(crate) struct ArgsImpl {
-    pub(crate) timelapse: Timer,
-}
+pub(crate) struct ArgsImpl {}
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -21,8 +17,8 @@ pub(crate) struct Args {
 
 impl Args {
     pub(crate) fn parse_input() -> Result<ArgsImpl, Error> {
-        let cli = Self::parse();
-        let timelapse: Timer = Timer::from_str(&cli.timelapse)?;
-        Ok(ArgsImpl { timelapse })
+        // TODO : Parsing of cli args to be used in future development
+        let _cli = Self::parse();
+        Ok(ArgsImpl {})
     }
 }
