@@ -1,7 +1,7 @@
 use crate::error::Error;
 use async_trait::async_trait;
 use backoff::ExponentialBackoff;
-use chrono::{ NaiveDateTime, Utc};
+use chrono::{NaiveDateTime, Utc};
 use futures::{pin_mut, TryStreamExt};
 use k8s_openapi::api::core::v1::{Event, Pod};
 use kube::runtime::{watcher, WatchStreamExt};
@@ -9,7 +9,7 @@ use kube::{api::ListParams, Api, Client};
 use reqwest::header;
 use reqwest::StatusCode;
 use serde::{Deserialize, Serialize};
-use serde_json::{json, };
+use serde_json::json;
 use std::env;
 use tracing::{debug, error, info};
 #[allow(dead_code)]
@@ -17,7 +17,7 @@ const IGNORE_POD_PHASE: [&str; 2] = ["Running", "Succeeded"];
 
 #[derive(Debug, Deserialize, Serialize)]
 struct ElasticEvent {
-    document: String,
+    document: serde_json::Value,
     #[serde(rename = "@timestamp")]
     timestamp: NaiveDateTime,
     #[serde(rename = "@cluster")]
@@ -52,9 +52,8 @@ impl ExportData for Pod {
             .redirect(reqwest::redirect::Policy::none())
             .build()
             .unwrap();
-        let event_json = serde_json::to_string(&e).unwrap();
         let z = json!(ElasticEvent {
-            document: event_json,
+            document: json!(&e),
             timestamp: Utc::now().naive_utc(),
             cluster: cluster.to_string(),
         });
