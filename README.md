@@ -44,7 +44,11 @@ curl -S -X POST -H "Content-Type: application/json" -d @input.json http://localh
   
 ```bash
 export API_SERVER_URL="http://localhost:3000/api/event"
-cargo run --bin controller --
+
+cargo run --bin controller --  --cluster "dev"
+
 ```
 
 3. Deploy some sample pods in KIND cluster to view the events getting populated in Elastic.
+
+
