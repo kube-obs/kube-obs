@@ -2,21 +2,21 @@ mod args;
 mod error;
 use std::process;
 mod pod;
-mod util;
-
+mod utils;
 use crate::{args::Args, error::Error, pod::pod_watcher};
-use common::init_logging;
 use tracing::info;
+use utils::init_logging;
 #[tokio::main]
 async fn main() -> Result<(), Error> {
     init_logging();
     match Args::parse_input() {
-        Ok(a) => {
+        //TODO: ArgsImpl will be used in future development
+        Ok(_a) => {
             // all good with parser start the pod watcher
             // in future it can watch other kubernetes resources like Job, Deployment
             tokio::select! {
-                _ = pod_watcher(&a.timelapse) => info!("pod event watcher failed"),
-               //_  = db_clean() => println!("db clean exited"),
+                _ = pod_watcher() => info!("pod event watcher failed"),
+
             }
 
             // delete the pods events from DB which are not in cluster
