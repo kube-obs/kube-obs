@@ -27,14 +27,32 @@ export const typeDefs = `
     type: ResourceType!
   }
 
+  input SearchIndexInput {
+    index: String!
+    query: JSONObject!
+  }
+
   type Mutation {
     addResource(input: AddResourceInput!): JSONObject!
     addEvent(input: AddEventInput!): JSONObject!
   }
+
+  type Query {
+    searchIndex(input: SearchIndexInput): JSONObject!
+  }
 `;
 
 export const resolvers = {
-  Query: {},
+  Query: {
+    async searchIndex(parent: unknown, args: { input: any }) {
+      const res = await client.search({
+        index: args.input.index,
+        body: args.input.query,
+      });
+
+      return res;
+    },
+  },
   Mutation: {
     addResource(parent: unknown, args: { input: object }) {
       console.log('>>> received resource ', args.input);
