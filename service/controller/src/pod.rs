@@ -165,9 +165,9 @@ async fn check_for_pod_failures(events: &Api<Event>, p: Pod, c: &String) -> Resu
         debug!("Sending event {:?} for pod {}", e, pod_name);
         e.post_data(&c).await?;
         debug!("Successful event pod {}", pod_name);
-        debug!("Sending pod resource {:?} for pod {}", p, pod_name);
-        p.post_data(&c).await?;
-        debug!("Successful sending pod resource {}", pod_name);
+        // debug!("Sending pod resource {:?} for pod {}", p, pod_name);
+        // p.post_data(&c).await?;
+        // debug!("Successful sending pod resource {}", pod_name);
     }
     // }
     Ok(())
