@@ -1,13 +1,20 @@
-import 'core-js/stable';
-import 'regenerator-runtime/runtime';
-import { FunctionComponent } from 'react';
-import { AppProps } from 'next/app';
-import Head from 'next/head';
 import { EuiErrorBoundary } from '@elastic/eui';
 import { Global } from '@emotion/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import 'core-js/stable';
+import { AppProps } from 'next/app';
+import Head from 'next/head';
+import { FunctionComponent } from 'react';
+import 'regenerator-runtime/runtime';
 import Chrome from '../components/chrome';
 import { Theme } from '../components/theme';
 import { globalStyes } from '../styles/global.styles';
+
+import '@elastic/charts/dist/theme_only_light.css';
+// or
+import '@elastic/charts/dist/theme_only_dark.css';
+
+const queryClient = new QueryClient();
 
 /**
  * Next.js uses the App component to initialize pages. You can override it
@@ -26,7 +33,9 @@ const EuiApp: FunctionComponent<AppProps> = ({ Component, pageProps }) => (
     <Theme>
       <Chrome>
         <EuiErrorBoundary>
-          <Component {...pageProps} />
+          <QueryClientProvider client={queryClient}>
+            <Component {...pageProps} />
+          </QueryClientProvider>
         </EuiErrorBoundary>
       </Chrome>
     </Theme>

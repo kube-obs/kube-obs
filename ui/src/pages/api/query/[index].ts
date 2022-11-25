@@ -2,7 +2,7 @@ import { client } from '../../../elastic/client';
 
 const handler = async (req, res) => {
   const { index } = req.query;
-  if (req.method === 'GET') {
+  if (req.method === 'POST') {
     // Process a POST request
 
     const elasticRes = await client.search({
