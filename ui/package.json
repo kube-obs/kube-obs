@@ -24,8 +24,6 @@
     "start": "next start",
     "test-docs": "yarn lint && bash scripts/test-docs.sh",
     "schema": "ts-node --transpile-only src/pages/api/schema.ts",
-    "setupElastic": "ts-node src/elastic/mockSetupElastic.ts",
-    "ingestMockData": "ts-node src/elastic/mock.ts",
     "codegen": "graphql-codegen --config codegen.ts"
   },
   "repository": {

@@ -53,7 +53,7 @@ const Index: FunctionComponent = () => {
     <>
       <KibanaLayout
         pageHeader={{
-          pageTitle: 'Pods',
+          pageTitle: 'Pod Health',
         }}>
         <EuiPanel paddingSize="l">
           <EuiText>

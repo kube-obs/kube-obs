@@ -27,8 +27,7 @@
     UI is available on http://localhost:5601
     Elasticsearch is available on localhost:9200
 
-1.  Run UI with `yarn dev` and then run `yarn setupElastic`.
-    Optionally, run `yarn ingestMockData` to ingest mock data from JSON folder
+1.  Run UI with `yarn dev`.
 ---
 
 ## 🧐 What's inside?

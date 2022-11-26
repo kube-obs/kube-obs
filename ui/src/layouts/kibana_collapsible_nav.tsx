@@ -34,7 +34,7 @@ const TopLinks: EuiPinnableListGroupItemProps[] = [
 
 const KibanaLinks: EuiPinnableListGroupItemProps[] = [
   { label: 'Cluster Health', href: `/dashboards/cluster-health` },
-  { label: 'Pods', href: `/dashboards/pods` },
+  { label: 'Pod Health', href: `/dashboards/pods` },
 ];
 
 const SecurityLinks: EuiPinnableListGroupItemProps[] = [
@@ -143,43 +143,10 @@ const CollapsibleNav = () => {
       }
       onClose={() => setNavIsOpen(false)}>
       {/* Dark deployments section */}
-      <EuiFlexItem grow={false} style={{ flexShrink: 0 }}>
-        <EuiCollapsibleNavGroup isCollapsible={false} background="dark">
-          <EuiThemeProvider colorMode="dark">
-            <EuiListGroup
-              maxWidth="none"
-              gutterSize="none"
-              size="s"
-              listItems={[
-                {
-                  label: 'Deployments',
-                  href: '#',
-                  iconType: 'logoCloud',
-                  iconProps: {
-                    color: 'ghost',
-                  },
-                },
-              ]}
-            />
-          </EuiThemeProvider>
-        </EuiCollapsibleNavGroup>
-      </EuiFlexItem>
+
       {/* Shaded pinned section always with a home item */}
       <EuiFlexItem grow={false}>
-        <EuiCollapsibleNavGroup background="light">
-          <EuiPinnableListGroup
-            aria-label="Pinned links" // A11y : Since this group doesn't have a visible `title` it should be provided an accessible description
-            listItems={alterLinksWithCurrentState(TopLinks).concat(
-              alterLinksWithCurrentState(pinnedItems, true)
-            )}
-            unpinTitle={addLinkNameToUnpinTitle}
-            onPinClick={removePin}
-            maxWidth="none"
-            color="text"
-            gutterSize="none"
-            size="s"
-          />
-        </EuiCollapsibleNavGroup>
+        <EuiCollapsibleNavGroup background="dark"></EuiCollapsibleNavGroup>
       </EuiFlexItem>
       <EuiHorizontalRule margin="none" />
       {/* Menu items */}
@@ -222,6 +189,33 @@ const CollapsibleNav = () => {
           }
           buttonElement="div"
           iconType="logoSecurity"
+          isCollapsible={true}
+          initialIsOpen={true}
+          onToggle={(isOpen: boolean) => toggleAccordion(isOpen, 'Kibana')}>
+          <EuiPinnableListGroup
+            aria-label="Kibana" // A11y : EuiCollapsibleNavGroup can't correctly pass the `title` as the `aria-label` to the right HTML element, so it must be added manually
+            listItems={alterLinksWithCurrentState(SecurityLinks)}
+            pinTitle={addLinkNameToPinTitle}
+            onPinClick={addPin}
+            maxWidth="none"
+            color="subdued"
+            gutterSize="none"
+            size="s"
+          />
+        </EuiCollapsibleNavGroup>
+      </EuiFlexItem>
+      <EuiFlexItem className="">
+        <EuiCollapsibleNavGroup
+          title={
+            <a
+              className="eui-textInheritColor"
+              href="#/navigation/collapsible-nav"
+              onClick={e => e.stopPropagation()}>
+              Deployments
+            </a>
+          }
+          buttonElement="div"
+          iconType="logoCloud"
           isCollapsible={true}
           initialIsOpen={true}
           onToggle={(isOpen: boolean) => toggleAccordion(isOpen, 'Kibana')}>

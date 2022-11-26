@@ -8,7 +8,7 @@ const handler = async (req, res) => {
 
     const elasticRes = await client.create({
       id: uuidv4(),
-      index: 'kube-obs',
+      index: 'kubeobs',
       type: String(type).toUpperCase(),
       body: req.body,
     });
