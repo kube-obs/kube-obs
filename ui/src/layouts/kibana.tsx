@@ -6,6 +6,7 @@ import {
   EuiPageTemplateProps,
   EuiPageContentHeaderProps,
 } from '@elastic/eui';
+import { RecoilURLSyncJSON } from 'recoil-sync';
 
 interface KibanaLayoutProps extends EuiPageTemplateProps {
   pageHeader: EuiPageContentHeaderProps;
@@ -18,20 +19,22 @@ const KibanaLayout: FunctionComponent<KibanaLayoutProps> = ({
 }) => {
   const styles = kibanaLayoutStyles();
   return (
-    <div css={styles.mainWrapper}>
-      <CollapsibleNav />
+    <RecoilURLSyncJSON location={{ part: 'queryParams' }}>
+      <div css={styles.mainWrapper}>
+        <CollapsibleNav />
 
-      <div css={styles.contentWrapper}>
-        <EuiPageTemplate
-          restrictWidth
-          panelled={false}
-          bottomBorder={true}
-          {...rest}>
-          <EuiPageTemplate.Header {...pageHeader} />
-          <EuiPageTemplate.Section>{children}</EuiPageTemplate.Section>
-        </EuiPageTemplate>
+        <div css={styles.contentWrapper}>
+          <EuiPageTemplate
+            restrictWidth
+            panelled={false}
+            bottomBorder={true}
+            {...rest}>
+            <EuiPageTemplate.Header {...pageHeader} />
+            <EuiPageTemplate.Section>{children}</EuiPageTemplate.Section>
+          </EuiPageTemplate>
+        </div>
       </div>
-    </div>
+    </RecoilURLSyncJSON>
   );
 };
 

@@ -1,23 +1,36 @@
+import { result } from 'nexus/dist/utils';
 import * as R from 'ramda';
 
-export const withElasticQuery = (
-  index: string,
-  body: object
-): (() => Promise<any>) => {
+export const transformElasticSQLResponse = (data: object) => {
+  if (data.rows && data.columns) {
+    return data.rows.map(row => {
+      const result = {};
+      row.map((propValue, idx) => {
+        result[data.columns[idx].name] = propValue;
+      });
+      return result;
+    });
+  }
+  return {};
+};
+
+export const withElasticQuery = (query: string): (() => Promise<any>) => {
   return async () => {
     try {
-      const res = await fetch(`/api/query/${index}`, {
+      const res = await fetch(`/api/query`, {
         method: 'POST',
         headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(body),
+        body: JSON.stringify({
+          query,
+        }),
       });
 
       const data = await res.json();
       console.log('[Elastic Debug]', data);
-      return data;
+      return transformElasticSQLResponse(data);
     } catch (err) {
       console.error(err);
       throw err;

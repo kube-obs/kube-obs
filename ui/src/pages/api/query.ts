@@ -1,8 +1,7 @@
-import { client } from '../../../elastic/client';
+import { client } from '../../elastic/client';
 
 const handler = async (req, res) => {
-  console.log('>>> received');
-  const { index } = req.query;
+  console.log('>>> received', req.body);
   if (req.method === 'POST') {
     // Process a POST request
 

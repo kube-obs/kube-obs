@@ -5,12 +5,11 @@ import 'core-js/stable';
 import { AppProps } from 'next/app';
 import Head from 'next/head';
 import { FunctionComponent } from 'react';
+import { RecoilRoot } from 'recoil';
 import 'regenerator-runtime/runtime';
 import Chrome from '../components/chrome';
 import { Theme } from '../components/theme';
 import { globalStyes } from '../styles/global.styles';
-import { store } from '../redux/store';
-import { Provider } from 'react-redux';
 
 import '@elastic/charts/dist/theme_only_light.css';
 // or
@@ -35,11 +34,12 @@ const EuiApp: FunctionComponent<AppProps> = ({ Component, pageProps }) => (
     <Theme>
       <Chrome>
         <EuiErrorBoundary>
-          <Provider store={store}>
-            <QueryClientProvider client={queryClient}>
-              <Component {...pageProps} />
-            </QueryClientProvider>
-          </Provider>
+          <RecoilRoot>
+              <QueryClientProvider client={queryClient}>
+                <Component {...pageProps} />
+              </QueryClientProvider>
+
+          </RecoilRoot>
         </EuiErrorBoundary>
       </Chrome>
     </Theme>

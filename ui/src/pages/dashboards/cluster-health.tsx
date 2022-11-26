@@ -1,5 +1,8 @@
+import dynamic from 'next/dynamic';
 import { FunctionComponent } from 'react';
-import KibanaLayout from '../../layouts/kibana';
+const KibanaLayout = dynamic(() => import('../../layouts/kibana'), {
+  ssr: false,
+});
 
 const Index: FunctionComponent = () => {
   return (

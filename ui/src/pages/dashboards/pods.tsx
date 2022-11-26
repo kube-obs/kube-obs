@@ -1,53 +1,37 @@
 import {
-  Chart,
-  Settings,
   AreaSeries,
   Axis,
-  timeFormatter,
+  Chart,
+  DARK_THEME,
+  LIGHT_THEME,
   niceTimeFormatByDay,
   ScaleType,
+  Settings,
+  timeFormatter,
 } from '@elastic/charts';
-import {
-  EuiPanel,
-  EuiCode,
-  EuiText,
-  dateFormatAliases,
-  formatDate,
-} from '@elastic/eui';
+import { dateFormatAliases, EuiPanel, EuiText, formatDate } from '@elastic/eui';
 import { useTheme } from '@emotion/react';
-import { useQuery } from '@tanstack/react-query';
-import { FunctionComponent } from 'react';
-import KibanaLayout from '../../layouts/kibana';
-import { withElasticQuery } from '../../lib/hooks';
-import { DARK_THEME, LIGHT_THEME } from '@elastic/charts';
 import * as R from 'ramda';
+import { FunctionComponent } from 'react';
 
-const getPodEventsByReason = withElasticQuery('kube-obs', {
-  size: 10000,
-  query: {
-    exists: {
-      field: 'document.reason',
-    },
-  },
-  aggs: {
-    sales_over_time: {
-      auto_date_histogram: {
-        field: '@timestamp',
-        buckets: 10,
-      },
-    },
-  },
+import dynamic from 'next/dynamic';
+
+const KibanaLayout = dynamic(() => import('../../layouts/kibana'), {
+  ssr: false,
 });
 
-const Index: FunctionComponent = () => {
-  const { data, isLoading, error } = useQuery({
-    queryKey: ['podEventsByReason'],
-    queryFn: getPodEventsByReason,
-  });
+// const getPodEventsByReason = withElasticQuery('kube-obs', );
 
+const Index: FunctionComponent = () => {
+  // const { data, isLoading, error } = useQuery({
+  //   queryKey: ['podEventsByReason'],
+  //   queryFn: getPodEventsByReason,
+  // });
+
+  const data = null;
   const { colorMode } = useTheme();
 
-  console.log('>>> data', data, 'isLoading', isLoading, 'error', error);
+  // console.log('>>> data', data, 'isLoading', isLoading, 'error', error);
 
   return (
     <>
