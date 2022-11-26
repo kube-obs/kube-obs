@@ -1,0 +1,29 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: pi
+spec:
+  template:
+    spec:
+      containers:
+        - name: ubuntu
+          image: ubuntu
+          command:
+            ["sh", "-c", " while true; do echo 'Hit CTRL+C'; sleep 1; done"]
+      restartPolicy: Never
+  backoffLimit: 4
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: p2
+spec:
+  template:
+    spec:
+      containers:
+        - name: ubuntu
+          image: ubuntu
+          command:
+            ["sh", "-c", " while true; do echo 'Hit CTRL+C'; sleep 1; done"]
+      restartPolicy: Never
+  backoffLimit: 4

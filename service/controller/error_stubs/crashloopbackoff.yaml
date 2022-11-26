@@ -1,0 +1,66 @@
+# POD status : RunContainerError and leads to CrashLoopBackOff
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ubuntu-deployment-1
+  labels:
+    app: ubuntu
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ubuntu
+  template:
+    metadata:
+      labels:
+        app: ubuntu
+    spec:
+      containers:
+        - name: ubuntu
+          image: ubuntu
+          command: ["rz", "123456"] # invalid command
+---
+# POD status : RunContainerError and leads to CrashLoopBackOff
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ubuntu-deployment-2
+  labels:
+    app: ubuntu
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ubuntu
+  template:
+    metadata:
+      labels:
+        app: ubuntu
+    spec:
+      containers:
+        - name: ubuntu
+          image: ubuntu
+          command: ["rz", "123456"] # invalid command
+---
+# POD status : RunContainerError and leads to CrashLoopBackOff
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ubuntu-deployment-3
+  labels:
+    app: ubuntu
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ubuntu
+  template:
+    metadata:
+      labels:
+        app: ubuntu
+    spec:
+      containers:
+        - name: ubuntu
+          image: ubuntu
+          command: ["rz", "123456"] # invalid command
+

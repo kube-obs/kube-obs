@@ -1,0 +1,65 @@
+# POD is success but readiness probe failed leading to unhealthy state of application
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: application-nginx
+  name: application-nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: application-nginx
+  template:
+    metadata:
+      labels:
+        app: application-nginx
+    spec:
+      containers:
+        - image: nginx:latest
+          name: application-nginx
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 2
+            httpGet:
+              scheme: HTTPS
+              path: /index.html
+              port: 8080
+            initialDelaySeconds: 2
+            periodSeconds: 2
+---
+# POD is success but readiness probe failed leading to unhealthy state of application
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: application-nginx
+  name: application-nginx-2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: application-nginx
+  template:
+    metadata:
+      labels:
+        app: application-nginx
+    spec:
+      containers:
+        - image: nginx:latest
+          name: application-nginx
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 2
+            httpGet:
+              scheme: HTTPS
+              path: /index.html
+              port: 8080
+            initialDelaySeconds: 2
+            periodSeconds: 2

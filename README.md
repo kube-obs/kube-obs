@@ -52,3 +52,20 @@ cargo run --bin controller --  --cluster "dev"
 3. Deploy some sample pods in KIND cluster to view the events getting populated in Elastic.
 
 
+## Testing
+
+### apply pods to generate error pod events
+  
+```bash
+kubectl apply -f service/controller/error_stubs
+```
+
+### apply pods to generate  success pod events
+
+* clone https://github.com/maheshrayas/kube-saver
+* apply the code
+  
+```bash
+
+kubectl apply -f tests/data
+```
