@@ -15,11 +15,13 @@ import {
   EuiAvatar,
   EuiThemeProvider,
   EuiBetaBadge,
+  EuiSelect,
 } from '@elastic/eui';
 import find from 'lodash/find';
 import findIndex from 'lodash/findIndex';
 import { css } from '@emotion/react';
 import ThemeSwitcher from '../components/chrome/theme_switcher';
+import { ClusterSelector } from '../components/k8s/cluster-selector';
 
 const TopLinks: EuiPinnableListGroupItemProps[] = [
   {
@@ -279,16 +281,8 @@ const CollapsibleNav = () => {
             items: [
               <EuiHeaderSectionItemButton
                 key={useGeneratedHtmlId()}
-                aria-label="Account menu">
-                <EuiBetaBadge
-                  style={{
-                    verticalAlign: 'bottom',
-                    cursor: 'pointer',
-                  }}
-                  label="Cluster 1"
-                  color={'accent'}
-                  tooltipContent="This module is not GA. Please help us by reporting any bugs."
-                />
+                aria-label="Cluster Selector">
+                <ClusterSelector />
               </EuiHeaderSectionItemButton>,
             ],
             breadcrumbs: breadcrumbs,

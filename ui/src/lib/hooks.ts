@@ -16,8 +16,8 @@ export const withElasticQuery = (
       });
 
       const data = await res.json();
-      console.log('>>> debug', data);
-      return R.pathOr([], ['hits', 'hits'], data);
+      console.log('[Elastic Debug]', data);
+      return data;
     } catch (err) {
       console.error(err);
       throw err;

@@ -9,6 +9,8 @@ import 'regenerator-runtime/runtime';
 import Chrome from '../components/chrome';
 import { Theme } from '../components/theme';
 import { globalStyes } from '../styles/global.styles';
+import { store } from '../redux/store';
+import { Provider } from 'react-redux';
 
 import '@elastic/charts/dist/theme_only_light.css';
 // or
@@ -33,9 +35,11 @@ const EuiApp: FunctionComponent<AppProps> = ({ Component, pageProps }) => (
     <Theme>
       <Chrome>
         <EuiErrorBoundary>
-          <QueryClientProvider client={queryClient}>
-            <Component {...pageProps} />
-          </QueryClientProvider>
+          <Provider store={store}>
+            <QueryClientProvider client={queryClient}>
+              <Component {...pageProps} />
+            </QueryClientProvider>
+          </Provider>
         </EuiErrorBoundary>
       </Chrome>
     </Theme>
