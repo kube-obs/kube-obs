@@ -11,7 +11,6 @@ const ClusterSelector = () => {
     queryFn: withElasticQuery('SELECT cluster FROM kubeobs GROUP BY cluster'),
   });
 
-  console.log('>>> data', data, '>>> isLoading', isLoading, 'error', error);
   const [cluster, setCluster] = useRecoilState(clusterState);
 
   useEffect(() => {

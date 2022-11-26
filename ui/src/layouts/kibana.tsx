@@ -1,12 +1,11 @@
-import { FunctionComponent } from 'react';
-import CollapsibleNav from './kibana_collapsible_nav';
-import { kibanaLayoutStyles } from './kibana.styles';
 import {
+  EuiPageContentHeaderProps,
   EuiPageTemplate,
   EuiPageTemplateProps,
-  EuiPageContentHeaderProps,
 } from '@elastic/eui';
-import { RecoilURLSyncJSON } from 'recoil-sync';
+import { FunctionComponent } from 'react';
+import { kibanaLayoutStyles } from './kibana.styles';
+import CollapsibleNav from './kibana_collapsible_nav';
 
 interface KibanaLayoutProps extends EuiPageTemplateProps {
   pageHeader: EuiPageContentHeaderProps;
@@ -19,22 +18,20 @@ const KibanaLayout: FunctionComponent<KibanaLayoutProps> = ({
 }) => {
   const styles = kibanaLayoutStyles();
   return (
-    <RecoilURLSyncJSON location={{ part: 'queryParams' }}>
-      <div css={styles.mainWrapper}>
-        <CollapsibleNav />
+    <div css={styles.mainWrapper}>
+      <CollapsibleNav />
 
-        <div css={styles.contentWrapper}>
-          <EuiPageTemplate
-            restrictWidth
-            panelled={false}
-            bottomBorder={true}
-            {...rest}>
-            <EuiPageTemplate.Header {...pageHeader} />
-            <EuiPageTemplate.Section>{children}</EuiPageTemplate.Section>
-          </EuiPageTemplate>
-        </div>
+      <div css={styles.contentWrapper}>
+        <EuiPageTemplate
+          restrictWidth
+          panelled={false}
+          bottomBorder={true}
+          {...rest}>
+          <EuiPageTemplate.Header {...pageHeader} />
+          <EuiPageTemplate.Section>{children}</EuiPageTemplate.Section>
+        </EuiPageTemplate>
       </div>
-    </RecoilURLSyncJSON>
+    </div>
   );
 };
 
