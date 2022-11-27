@@ -40,7 +40,18 @@ const KibanaLinks: EuiPinnableListGroupItemProps[] = [
 ];
 
 const SecurityLinks: EuiPinnableListGroupItemProps[] = [
-  { label: 'Pods', href: `/dashboards/pods` },
+  { label: 'Pods', href: `/security/pods` },
+];
+
+const DeploymentLinks: EuiPinnableListGroupItemProps[] = [
+  { label: 'Pods', href: `/deployments/pods` },
+  { label: 'Deployments', href: `/deployments/deployments` },
+  { label: 'Secrets', href: `/deployments/secrets` },
+  { label: 'ConfigMaps', href: `/deployments/config-maps` },
+];
+
+const DiagnosticsLinks: EuiPinnableListGroupItemProps[] = [
+  { label: 'Super Search', href: `/diagnostics/super-search` },
 ];
 
 const CollapsibleNav = () => {
@@ -223,7 +234,34 @@ const CollapsibleNav = () => {
           onToggle={(isOpen: boolean) => toggleAccordion(isOpen, 'Kibana')}>
           <EuiPinnableListGroup
             aria-label="Kibana" // A11y : EuiCollapsibleNavGroup can't correctly pass the `title` as the `aria-label` to the right HTML element, so it must be added manually
-            listItems={alterLinksWithCurrentState(SecurityLinks)}
+            listItems={alterLinksWithCurrentState(DeploymentLinks)}
+            pinTitle={addLinkNameToPinTitle}
+            onPinClick={addPin}
+            maxWidth="none"
+            color="subdued"
+            gutterSize="none"
+            size="s"
+          />
+        </EuiCollapsibleNavGroup>
+      </EuiFlexItem>
+      <EuiFlexItem className="">
+        <EuiCollapsibleNavGroup
+          title={
+            <a
+              className="eui-textInheritColor"
+              href="#/navigation/collapsible-nav"
+              onClick={e => e.stopPropagation()}>
+              Diagnostics
+            </a>
+          }
+          buttonElement="div"
+          iconType="logoCloud"
+          isCollapsible={true}
+          initialIsOpen={true}
+          onToggle={(isOpen: boolean) => toggleAccordion(isOpen, 'Kibana')}>
+          <EuiPinnableListGroup
+            aria-label="Kibana" // A11y : EuiCollapsibleNavGroup can't correctly pass the `title` as the `aria-label` to the right HTML element, so it must be added manually
+            listItems={alterLinksWithCurrentState(DiagnosticsLinks)}
             pinTitle={addLinkNameToPinTitle}
             onPinClick={addPin}
             maxWidth="none"

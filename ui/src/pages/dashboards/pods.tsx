@@ -65,8 +65,6 @@ const PodResourceStats = () => {
     enabled: !!cluster,
   });
 
-  console.log('>>>> debug', data, '>>> err', error, isLoading);
-
   const statItems = (data || []).map(row => (
     <EuiFlexItem>
       <EuiStat
@@ -200,9 +198,9 @@ const Index: FunctionComponent = () => {
         }}>
         <EuiPanel paddingSize="l">
           <EuiText>
-            <h3>Pod resource stats</h3>
+            <h3>Pod resources</h3>
             <PodResourceStats />
-            <h3>Pod event stats</h3>
+            <h3>Pod events</h3>
             <PodEventStats />
             <h3>Pod events</h3>
             <Chart size={{ height: 200, width: '90%' }}>

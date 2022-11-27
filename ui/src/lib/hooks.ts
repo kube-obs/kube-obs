@@ -25,6 +25,12 @@ export const withElasticQuery = (query: string): (() => Promise<any>) => {
         },
         body: JSON.stringify({
           query,
+          runtime_mappings: {
+            _document_id: {
+              type: 'keyword',
+              script: "emit(doc['_id'].value)",
+            },
+          },
         }),
       });
 
