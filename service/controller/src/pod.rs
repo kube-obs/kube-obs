@@ -1,5 +1,4 @@
 use crate::error::Error;
-use async_trait::async_trait;
 use backoff::ExponentialBackoff;
 use chrono::Utc;
 use futures::{pin_mut, TryStreamExt};
@@ -10,19 +9,35 @@ use reqwest::header;
 use reqwest::StatusCode;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-use std::env;
+use std::{env, fmt};
 use tracing::{debug, error, info};
 #[allow(dead_code)]
 const IGNORE_POD_PHASE: [&str; 2] = ["Running", "Succeeded"];
 
+enum PostType {
+    Event,
+    PodResource,
+}
+
+impl fmt::Display for PostType {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            PostType::Event => write!(f, "POD_EVENT"),
+            PostType::PodResource => write!(f, "POD_RESOURCE"),
+        }
+    }
+}
+
 #[derive(Debug, Deserialize, Serialize)]
 struct ElasticInsert<T> {
     document: T,
-    #[serde(rename = "@timestamp")]
+    metadata: Metadata,
+}
+#[derive(Debug, Deserialize, Serialize)]
+struct Metadata {
     timestamp: String,
-    #[serde(rename = "@cluster")]
     cluster: String,
-    #[serde(rename = "@documentType")]
+    #[serde(rename = "type")]
     typ: String,
 }
 
@@ -34,32 +49,31 @@ struct ElasticInsert<T> {
 //     !IGNORE_POD_PHASE.contains(&status.as_str())
 // }
 
-#[async_trait]
-trait ExportData {
-    // TODO:
-    // 1. Since the ElasticInsert accepts generic type T, implement this trait to both Event and Pod,
-    // 2. or make this trait with default implementaion which accepts struct T
-    // 3. lot of duplicate in post request
-    async fn post_data(&self, cluster: &str) -> Result<(), Error>;
-
-    fn get_api_url() -> String {
-        //local: http://localhost:3000/api/event
-        env::var("API_SERVER_URL").expect("API_SERVER_URL must be set, for example \n export API_SERVER_URL=http://localhost:3000/api/event")
-    }
-
-    fn get_time_stamp() -> String {
-        Utc::now()
-            .naive_utc()
-            .format("%Y-%m-%dT%H:%M:%S.%fZ")
-            .to_string()
-    }
+fn get_api_url() -> String {
+    //local: http://localhost:3000/api/event
+    env::var("API_SERVER_URL").expect("API_SERVER_URL must be set, for example \n export API_SERVER_URL=http://localhost:3000/api/event")
 }
 
-#[async_trait]
-#[allow(unused_variables)]
-impl ExportData for Pod {
-    async fn post_data(&self, cluster: &str) -> Result<(), Error> {
-        let url = format!("{}/POD_RESOURCE", Self::get_api_url());
+fn get_time_stamp() -> String {
+    Utc::now()
+        .naive_utc()
+        .format("%Y-%m-%dT%H:%M:%S.%fZ")
+        .to_string()
+}
+
+struct SendData<'a, T> {
+    post_type: PostType,
+    cluster: &'a str,
+    resource_name: &'a str,
+    document: T,
+}
+impl<'a, T> SendData<'a, T>
+where
+    T: Serialize + Clone,
+{
+    pub async fn send_data(&self) -> Result<(), Error> {
+        //self.post_type : POD_EVENT or POD_RESOURCE
+        let url = format!("{}/{}", get_api_url(), self.post_type);
         let mut headers = header::HeaderMap::new();
         headers.insert("content-type", "application/json".parse().unwrap());
         let client = reqwest::Client::builder()
@@ -68,49 +82,12 @@ impl ExportData for Pod {
             .unwrap();
 
         let z = json!(ElasticInsert {
-            document: self.to_owned(),
-            timestamp: Self::get_time_stamp(),
-            cluster: cluster.to_string(),
-            typ: "POD_RESOURCE".to_string() // TODO: Enum type
-        });
-        let res = client
-            .post(&url)
-            .headers(headers)
-            .body(z.to_string())
-            .send()
-            .await?;
-        if res.status() != StatusCode::OK {
-            error!(
-                "Error during post pod resource object {}",
-                self.metadata.name.as_ref().unwrap()
-            );
-            debug!("Error details {}", res.text().await?)
-        } else {
-            info!(
-                "Success: post pod {} resource ",
-                &self.metadata.name.as_ref().unwrap()
-            );
-        }
-        Ok(())
-    }
-}
-#[async_trait]
-#[allow(unused_variables)]
-impl ExportData for Event {
-    async fn post_data(&self, cluster: &str) -> Result<(), Error> {
-        let url = format!("{}/POD_EVENT", Self::get_api_url());
-        let mut headers = header::HeaderMap::new();
-        headers.insert("content-type", "application/json".parse().unwrap());
-        let client = reqwest::Client::builder()
-            .redirect(reqwest::redirect::Policy::none())
-            .build()
-            .unwrap();
-
-        let z = json!(ElasticInsert {
-            document: self.to_owned(),
-            timestamp: Self::get_time_stamp(),
-            cluster: cluster.to_string(),
-            typ: "POD_EVENT".to_string() // TODO: Enum type
+            document: self.document.clone(),
+            metadata: Metadata {
+                timestamp: get_time_stamp(),
+                cluster: self.cluster.to_owned(),
+                typ: self.post_type.to_string(),
+            }
         });
 
         let res = client
@@ -122,14 +99,16 @@ impl ExportData for Event {
 
         if res.status() != StatusCode::OK {
             error!(
-                "Error during pod post event {}",
-                self.metadata.name.as_ref().unwrap()
+                "Error during {} post pod name{}",
+                self.post_type.to_string(),
+                self.resource_name
             );
             debug!("Error details {}", res.text().await?)
         } else {
             info!(
-                "post event successful for pod {}",
-                &self.metadata.name.as_ref().unwrap()
+                "post successful for {} pod name{}",
+                self.post_type.to_string(),
+                self.resource_name
             );
         }
         Ok(())
@@ -154,20 +133,32 @@ pub(crate) async fn pod_watcher(c: String) {
     }
 }
 
-async fn check_for_pod_failures(events: &Api<Event>, p: Pod, c: &String) -> Result<(), Error> {
+async fn check_for_pod_failures(events: &Api<Event>, p: Pod, cluster: &str) -> Result<(), Error> {
     let pod_name = p.metadata.name.clone().unwrap();
     let opts = ListParams::default().fields(&format!(
         "involvedObject.kind=Pod,involvedObject.name={}",
         pod_name
     ));
+    debug!("Successful event pod {}", pod_name);
+    let z = SendData {
+        post_type: PostType::PodResource,
+        cluster,
+        resource_name: &pod_name,
+        document: p,
+    };
+    // debug!("Sending pod resource {:?} for pod {}", p, pod_name);
+    z.send_data().await?;
+    // debug!("Successful sending pod resource {}", pod_name);
     let ev_list = events.list(&opts).await?;
     for e in ev_list {
         debug!("Sending event {:?} for pod {}", e, pod_name);
-        e.post_data(&c).await?;
-        debug!("Successful event pod {}", pod_name);
-        // debug!("Sending pod resource {:?} for pod {}", p, pod_name);
-        // p.post_data(&c).await?;
-        // debug!("Successful sending pod resource {}", pod_name);
+        let z = SendData {
+            post_type: PostType::Event,
+            cluster,
+            resource_name: &pod_name,
+            document: e,
+        };
+        z.send_data().await?;
     }
     // }
     Ok(())
