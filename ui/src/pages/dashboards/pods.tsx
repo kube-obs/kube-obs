@@ -45,24 +45,68 @@ const getTitleColor = (reason: string) => {
   } else if (GoodReasons.includes(reason)) {
     return 'success';
   }
+  return 'default';
 };
 
-const PodStats = () => {
+const PodResourceStats = () => {
   const [cluster] = useRecoilState(clusterState);
   const { data, isLoading, error } = useQuery({
-    queryKey: ['podStats', cluster],
+    queryKey: ['getPodResourceStats', cluster],
     queryFn: withElasticQuery(`
     SELECT 
-      cluster, 
+      document.status.phase, 
+      count(*) AS count 
+    FROM kubeobs 
+    WHERE metadata.cluster = '${cluster}'
+    AND metadata.type = 'POD_RESOURCE'
+    GROUP BY metadata.cluster, document.status.phase
+    ORDER BY document.status.phase
+    `),
+    enabled: !!cluster,
+  });
+
+  console.log('>>>> debug', data, '>>> err', error, isLoading);
+
+  const statItems = (data || []).map(row => (
+    <EuiFlexItem>
+      <EuiStat
+        title={row.count}
+        description={row['document.status.phase']}
+        textAlign="right"
+        titleColor={getTitleColor(row['document.status.phase'])}
+        isLoading={isLoading}></EuiStat>
+    </EuiFlexItem>
+  ));
+
+  return (
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+      }}>
+      {statItems}
+    </div>
+  );
+};
+
+const PodEventStats = () => {
+  const [cluster] = useRecoilState(clusterState);
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['getPodEventStats', cluster],
+    queryFn: withElasticQuery(`
+    SELECT 
       document.reason, 
       count(*) AS count 
     FROM kubeobs 
-    WHERE cluster = '${cluster}'
-    GROUP BY cluster, document.reason
+    WHERE metadata.cluster = '${cluster}'
+    AND metadata.type = 'POD_EVENT'
+    GROUP BY metadata.cluster, document.reason
     ORDER BY document.reason
     `),
     enabled: !!cluster,
   });
+
+  console.log('>>>> debug', data, '>>> err', error, isLoading);
 
   const statItems = (data || []).map(row => (
     <EuiFlexItem>
@@ -86,6 +130,19 @@ const PodStats = () => {
   );
 };
 
+// SELECT
+//       HISTOGRAM(metadata.timestamp, INTERVAL 1 MINUTE) as timestamp,
+//       metadata.cluster as cluster,
+//       document.reason,
+//       count(*) AS count
+//     FROM kubeobs
+//     WHERE cluster = '${cluster}' AND
+//       metadata.type = "POD_EVENT"
+//     GROUP BY
+//       metadata.cluster,
+//       document.reason,
+//       HISTOGRAM(metadata.timestamp, INTERVAL 1 MINUTE)
+
 const Index: FunctionComponent = () => {
   const { colorMode } = useTheme();
 
@@ -94,16 +151,17 @@ const Index: FunctionComponent = () => {
     queryKey: ['podHistogram', cluster],
     queryFn: withElasticQuery(`
     SELECT 
-      HISTOGRAM(timestamp, INTERVAL 1 MINUTE) as timestamp, 
-      cluster, 
-      document.reason, 
-      count(*) AS count 
+      HISTOGRAM(metadata.timestamp, INTERVAL 1 MINUTE) as timestamp,
+      document.reason,
+      count(*) AS count
     FROM kubeobs 
-    WHERE cluster = '${cluster}'
-    GROUP BY 
-      cluster, 
-      document.reason, 
-      HISTOGRAM(timestamp, INTERVAL 1 MINUTE)
+    WHERE 
+      metadata.cluster = '${cluster}' AND
+      metadata.type = 'POD_EVENT'
+    GROUP BY
+      metadata.cluster,
+      document.reason,
+      HISTOGRAM(metadata.timestamp, INTERVAL 1 MINUTE)
     `),
     enabled: !!cluster,
   });
@@ -124,14 +182,15 @@ const Index: FunctionComponent = () => {
     );
   };
 
-  const areas =
-    data &&
-    Object.values(
-      R.mapObjIndexed(
-        createAreas,
-        R.groupBy(R.propOr('Unknown', 'document.reason'), data)
+  const areas = data
+    ? data &&
+      Object.values(
+        R.mapObjIndexed(
+          createAreas,
+          R.groupBy(R.propOr('Unknown', 'document.reason'), data)
+        )
       )
-    );
+    : [];
 
   return (
     <>
@@ -141,8 +200,10 @@ const Index: FunctionComponent = () => {
         }}>
         <EuiPanel paddingSize="l">
           <EuiText>
-            <h3>Pod stats</h3>
-            <PodStats />
+            <h3>Pod resource stats</h3>
+            <PodResourceStats />
+            <h3>Pod event stats</h3>
+            <PodEventStats />
             <h3>Pod events</h3>
             <Chart size={{ height: 200, width: '90%' }}>
               <Settings
@@ -151,19 +212,6 @@ const Index: FunctionComponent = () => {
                 legendPosition="bottom"
               />
               {areas}
-              {/* <AreaSeries
-                id="financial"
-                name="Financial"
-                data={[]}
-                xScaleType={ScaleType.Time}
-                yScaleType={ScaleType.Linear}
-                xAccessor={R.pathOr(null, [
-                  '_source',
-                  'document',
-                  'lastTimestamp',
-                ])}
-                yAccessors={[() => Math.random() * 50]}
-              /> */}
 
               <Axis
                 title={formatDate(Date.now(), dateFormatAliases.date)}

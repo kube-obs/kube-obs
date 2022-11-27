@@ -4,11 +4,14 @@ import { useEffect } from 'react';
 import { useRecoilState } from 'recoil';
 import { withElasticQuery } from '../../lib/hooks';
 import { clusterState } from '../../recoil/cluster';
+import * as R from "ramda";
 
 const ClusterSelector = () => {
   const { data, isLoading, error } = useQuery({
     queryKey: ['clusterList'],
-    queryFn: withElasticQuery('SELECT cluster FROM kubeobs GROUP BY cluster'),
+    queryFn: withElasticQuery(
+      'SELECT metadata.cluster FROM kubeobs GROUP BY metadata.cluster'
+    ),
   });
 
   const [cluster, setCluster] = useRecoilState(clusterState);
@@ -22,8 +25,8 @@ const ClusterSelector = () => {
   const options =
     (data &&
       data.map(item => ({
-        value: item.cluster,
-        text: item.cluster,
+        value: R.prop("metadata.cluster", item),
+        text: R.prop("metadata.cluster", item),
       }))) ||
     [];
 
