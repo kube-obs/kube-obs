@@ -6,14 +6,20 @@ const handler = async (req, res) => {
   if (req.method === 'POST') {
     // Process a POST request
 
-    const elasticRes = await client.create({
-      id: uuidv4(),
-      index: 'kubeobs',
-      type: String(type).toUpperCase(),
-      body: req.body,
-    });
+    try {
+      const elasticRes = await client.create({
+        id: uuidv4(),
+        index: 'kubeobs',
+        // type: String(type).toUpperCase(),
+        body: req.body,
+      });
 
-    res.status(200).json(elasticRes.body);
+      res.status(200).json(elasticRes.body);
+    } catch (err) {
+      res.status(400).json({
+        error: err,
+      });
+    }
   } else {
     // Handle any other HTTP method
 
