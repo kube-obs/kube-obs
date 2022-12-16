@@ -1,0 +1,44 @@
+# 2 errors status can be seen when the we deploy this pod
+# STATUS: ErrImagePull is an error happening when the image specified for a container can’t be retrieved or pulled.
+# STATUS: ImagePullBackOff is the waiting grace period while the image pull is fixed.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ubuntu-deployment-image-pull
+  labels:
+    app: ubuntu
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ubuntu
+  template:
+    metadata:
+      labels:
+        app: ubuntu
+    spec:
+      containers:
+        - name: ubuntu
+          image: ubunt # invalid image
+          command: ["sleep", "123456"]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ubuntu-deployment-image-pull-2
+  labels:
+    app: ubuntu
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ubuntu
+  template:
+    metadata:
+      labels:
+        app: ubuntu
+    spec:
+      containers:
+        - name: ubuntu
+          image: ubunt # invalid image
+          command: ["sleep", "123456"]
